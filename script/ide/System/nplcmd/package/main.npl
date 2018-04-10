@@ -76,7 +76,7 @@ local function npm_init(ctx)
 		return
 	end
 
-	local package_name = string.match(ctx_args[2] or "", '^[%w%d]+$')
+	local package_name = string.match(ctx_args[2] or "", '^[-_%w]+$')
 	force = get_option_value(ctx_args, "-f") or get_option_value(ctx_args, "--force")
 	args.name = package_name or get_option_value(ctx_args, "--name=(.-)%s*$")
 	args.version = get_option_value(ctx_args, "-v=(.-)%s*$") or get_option_value(ctx_args, "--version=(.-)%s*$") or "1.0.0"
@@ -386,6 +386,7 @@ local function npm_loader(ctx)
 	-- 初始化加载包
 	npm_init_load_package()
 
+	local package_info = {}
 	local path = ctx.path
 	local package_config_filename = ctx.path .. "/package.lock"
 
@@ -394,13 +395,15 @@ local function npm_loader(ctx)
 		package_config_filename = ctx.path .. "/package.npl"
 		if not g_file:is_exist(package_config_filename) then
 			--g_log.info("package.npl配置文件不存在")
-			return
+			return package_info
 		end
 	end
 
 	local package_list = npm:get_package_list_by_filename(package_config_filename)
+
 	for _, x in ipairs(package_list) do
 		npm:load_package(x)
+		package_info[x.name] = x
 		--g_log.info("加载包:" .. x.name .. " 版本:" .. x.version)
 		-- 返回值有问题
 		--if not npm:load_package(x) then
@@ -409,6 +412,8 @@ local function npm_loader(ctx)
 			--g_log.info("加载包:" .. x.name .. " 版本:" .. x.version)
 		--end
 	end
+
+	return package_info
 end
 
 local function npm_compile_usage()
@@ -579,7 +584,7 @@ return function(ctx)
 		npm_compile(ctx)
 	elseif cmd_name == "loader" then
 		-- npm loader 加载包配置
-		npm_loader(ctx)
+		return npm_loader(ctx)
 	elseif cmd_name == "package" then
 		npm_package(ctx)
 	else

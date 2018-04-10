@@ -15,7 +15,7 @@ local function npl_package_manager(cmdName)
 		ctx.arg = ctx.arg or {}
 		table.insert(ctx.arg, 1, cmdName)
 		--log(ctx)
-		package(ctx)
+		return package(ctx)
 	end
 end
 
@@ -36,7 +36,7 @@ local cmd_list = {
 }
 
 function _M.run(command, ctx)
-    cmd_list[command](ctx)
+    return cmd_list[command](ctx)
 end
 
 function _M.include_cmd(command)

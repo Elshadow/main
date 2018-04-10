@@ -31,10 +31,12 @@ local args = ParaEngine.GetAppCommandLineByParam("nplcmd", "")
 local file_result
 
 local function cmd_begin()
+	NPL.PackageManager = {}  -- 定义NPL 包管理对象
     ctx.path = ParaEngine.GetAppCommandLineByParam("cmd_path", "")
 end
 
 local function cmd_end()
+	NPL.PackageManager = nil -- 清楚包管理对象
     if not ctx.keep_alive then ParaGlobal.Exit(file_result or 0) end
 end
 
@@ -120,7 +122,8 @@ local function cmd_exec(args, ctx)
             file_result = Embeded.run(script, ctx)
         else
 			-- 执行用户脚本前，先加载依赖包
-			Embeded.run("loader", {path = ctx.path, arg = {}})
+			
+			NPL.PackageManager.package_info = Embeded.run("loader", {path = ctx.path, arg = {}})
 
             local cmd = NPL.load(script)
             if type(cmd) == "function" then

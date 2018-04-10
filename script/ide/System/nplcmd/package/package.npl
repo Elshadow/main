@@ -1,0 +1,14 @@
+{
+      ["description"] = "package description",
+      ["version"] = "1.0.0",
+      ["keywords"] = {
+        [1] = "package",
+        [2] = "unknow",
+      },
+      ["dependencies"] = {
+        ["nws"] = "1.0.0",
+      },
+      ["author"] = "unknow",
+      ["name"] = "package",
+      ["rendme"] = "README.md",
+    }
