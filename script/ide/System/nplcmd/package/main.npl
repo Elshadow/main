@@ -68,7 +68,6 @@ nplc init packagename --version=1.0.0
 end
 
 local function npm_init(ctx)
-<<<<<<< HEAD
 	local path = ctx.path
 	local package_config_filename = path .. '/package.npl'
 	local force = false
@@ -116,56 +115,6 @@ local function npm_init(ctx)
 
 	g_log.info("已生成包配置文件:" .. package_config_filename)
 	return
-=======
-    local path = ctx.path
-    local package_config_filename = path .. "/package.npl"
-    local force = false
-    local args = {}
-    local ctx_args = ctx.arg or {}
-    local help = get_option_value(ctx_args, "-h") or get_option_value(ctx_args, "--help")
-    if help then
-        npm_init_usage()
-        return
-    end
-
-    local package_name = string.match(ctx_args[1] or "", "^[%w%d]+$")
-    force = get_option_value(ctx_args, "-f") or get_option_value(ctx_args, "--force")
-    args.name = package_name or get_option_value(ctx_args, "--name=(.-)%s*$")
-    args.version =
-        get_option_value(ctx_args, "-v=(.-)%s*$") or get_option_value(ctx_args, "--version=(.-)%s*$") or "1.0.0"
-    args.author = get_option_value(ctx_args, "--author=(.-)%s*$") or "unknow"
-
-    if not args.name then
-        g_log.fatal("缺少包名参数")
-
-        npm_init_usage()
-        return
-    end
-
-    args.description = "package description"
-    args.keywords = {args.name, args.author}
-    args.rendme = "README.md"
-    args.dependencies = {}
-    --args.repository = {}
-    args.download_url = nil
-
-    if g_file:is_exist(package_config_filename) then
-        g_log.fatal("包配置文件已存在")
-        if not force then
-            return
-        end
-        g_log.info("重新生成包配置文件")
-    end
-
-    local content = commonlib.serialize2(args, 1)
-    if not g_file:write(package_config_filename, content) then
-        g_log.fatal("写包配置文件失败")
-        return
-    end
-
-    g_log.info("已生成包配置文件:" .. package_config_filename)
-    return
->>>>>>> c72e8a4b622c986b27642ce8162212b4225279df
 end
 
 local function npm_remove_usage()
@@ -202,7 +151,7 @@ local function npm_remove(ctx)
         return
     end
 
-    local package_name = string.match(ctx_args[1] or "", "^[%w%d]+$")
+    local package_name = string.match(ctx_args[2] or "", "^[%w%d]+$")
     local all = get_option_value(ctx_args, "-a") or get_option_value(ctx_args, "--all")
     local _local = get_option_value(ctx_args, "-l") or get_option_value(ctx_args, "--local")
     args.name = package_name or get_option_value(ctx_args, "--name=(.-)%s*$")
@@ -325,8 +274,8 @@ local function npm_install(ctx)
     local package_src = nil
     local force = get_option_value(ctx_args, "-f") or get_option_value(ctx_args, "--force")
     local _local = get_option_value(ctx_args, "-l") or get_option_value(ctx_args, "--local")
-    if string.match(ctx_args[1] or "", "^[^-]+") then
-        package_src = ctx_args[1]
+    if string.match(ctx_args[2] or "", "^[^-]+") then
+        package_src = ctx_args[2]
     end
 
     args.name = get_option_value(ctx_args, "--name=(.-)%s*$")
@@ -443,7 +392,6 @@ end
 
 -- 加载应用程序依赖包
 local function npm_loader(ctx)
-<<<<<<< HEAD
 	-- 初始化加载包
 	npm_init_load_package()
 
@@ -475,29 +423,6 @@ local function npm_loader(ctx)
 	end
 
 	return package_info
-=======
-    -- 初始化加载包
-    npm_init_load_package()
-
-    local path = ctx.path or g_lfs.currentdir()
-    local package_config_filename = ctx.path .. "/package.lock"
-
-    if not g_file:is_exist(package_config_filename) then
-        --g_log.info("package.lock配置文件不存在")
-        package_config_filename = ctx.path .. "/package.npl"
-        if not g_file:is_exist(package_config_filename) then
-            --g_log.info("package.npl配置文件不存在")
-            return
-        end
-    end
-
-	local packages = npm:get_package_list_by_filename(package_config_filename)
-	NPL.PackageManager.init(packages)
-    for _, x in ipairs(packages) do
-        npm:load_package(x)
-        -- g_log.info(format("load package %s v~%s", x.name, x.version))
-    end
->>>>>>> c72e8a4b622c986b27642ce8162212b4225279df
 end
 
 local function npm_compile_usage()
@@ -652,11 +577,9 @@ package  生成安装包并上传至包服务器
 end
 
 -- 入口函数
-<<<<<<< HEAD
 return function(ctx)
 	local args = ctx.arg
 	
-	local package_args = {}
 	local cmd_name = args[1]
 	--g_log(ctx)
 	if cmd_name == "install" then
@@ -682,33 +605,4 @@ return function(ctx)
 	else
 		npm_usage()
 	end
-=======
-return function(cmd, ctx)
-    local args = ctx.arg
-
-    --g_log(ctx)
-    if cmd == "install" then
-        -- npm install 安装包
-        npm_install(ctx)
-    elseif cmd == "init" then
-        -- npm init 构建项目package文件
-        npm_init(ctx)
-    elseif cmd == "list" then
-        -- npm list 列出已安装
-        npm_list(ctx)
-    elseif cmd == "remove" then
-        -- npm remove 移除包
-        npm_remove(ctx)
-    elseif cmd == "compile" then
-        --  npm compile 编译包配置
-        npm_compile(ctx)
-    elseif cmd == "loader" then
-        -- npm loader 加载包配置
-        npm_loader(ctx)
-    elseif cmd == "package" then
-        npm_package(ctx)
-    else
-        npm_usage()
-    end
->>>>>>> c72e8a4b622c986b27642ce8162212b4225279df
 end

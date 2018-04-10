@@ -348,6 +348,7 @@ end
 
 -- 加载包
 function npm:load_package(package)
+	--print(package.install_dir)
     return NPL.load(package.install_dir)
 end
 
